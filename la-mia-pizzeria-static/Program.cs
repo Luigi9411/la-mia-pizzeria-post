@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSqlServer<PizzaContext>("Data Source=localhost;Initial Catalog=PizzaDb;Integrated Security=True;TrustServerCertificate=True");
 
 var app = builder.Build();
 
@@ -26,9 +27,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Pizza}/{action=Index}/{id?}");
 
-using (var ctx = new PizzaContext())
+
+using (var scope = app.Services.CreateScope())
+using (var ctx = scope.ServiceProvider.GetService<PizzaContext>())
 {
-    ctx.Seed();
+    ctx!.Seed();
 }
 
 app.Run();

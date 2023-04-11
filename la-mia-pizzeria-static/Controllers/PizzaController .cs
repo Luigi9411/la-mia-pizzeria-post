@@ -6,12 +6,19 @@ namespace la_mia_pizzeria_static.Controllers
 {
     public class PizzaController : Controller
     {
-        
+        private readonly ILogger<PizzaController> _logger;
+        private readonly PizzaContext _context;
+
+        public PizzaController(ILogger<PizzaController> logger, PizzaContext context)
+        {
+            _logger = logger;
+            _context = context;
+        }
+
         public IActionResult Index()
         {
-            using var ctx = new PizzaContext();
 
-            var pizzas = ctx.Pizzas.ToArray();
+            var pizzas = _context.Pizzas.ToArray();
 
             return View(pizzas);
         }
@@ -19,9 +26,7 @@ namespace la_mia_pizzeria_static.Controllers
         public IActionResult Detail(int id)
         {
 
-            using var ctx = new PizzaContext();
-
-            var pizza = ctx.Pizzas.Find(id);
+            var pizza = _context.Pizzas.Find(id);
 
             if (pizza is null)
             {
@@ -45,10 +50,8 @@ namespace la_mia_pizzeria_static.Controllers
                return View(pizza);
             }
 
-            using var ctx = new PizzaContext(); 
-
-            ctx.Pizzas.Add(pizza);
-            ctx.SaveChanges();
+            _context.Pizzas.Add(pizza);
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
